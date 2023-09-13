@@ -3531,7 +3531,7 @@ contains
                 
                     call throw_exception(                                       &
                         'Error in parse_string: Expecting end of string'        &
-                    )                                                           &
+                    )                                                           
                     return
                     
                 else if (quotation_mark == c .and. last /= backslash) then
