@@ -47,6 +47,7 @@ module fpsuite_json
     
 
     type,public :: json_value
+        !
         !  Purpose:
         !    Type used to construct the linked-list json structure
         !
@@ -57,6 +58,7 @@ module fpsuite_json
         !    call json_add(p,'value',1.0d0)
         !    call json_print(p,'test.json')
         !    call json_destroy(p)
+        !
         sequence  
 
         ! linked list variables:
@@ -98,6 +100,7 @@ module fpsuite_json
         !    call json%get('var.r(3)',rval,found)
         !    call json%get('var.c',cval,found)
         !    call json%destroy()
+        !
         private
 
         !the JSON structure read from the file:
@@ -1027,8 +1030,10 @@ contains
                 call to_logical(p_var,val)    !update the value
             case default
                 found = .false.
-                call throw_exception('Error in json_update_logical: '//&
-                                    'the variable is not a scalar value')
+                call throw_exception(                                           &
+                    'Error in json_update_logical: ' //                         &
+                    'the variable is not a scalar value'                        &
+                )
             end select          
         else
             call json_add(p,name,val)   !add the new element
@@ -1060,8 +1065,10 @@ contains
                     call to_double(p_var,val)
                 case default
                     found = .false.
-                    call throw_exception('Error in json_update_double: '//      &
-                                         'the variable is not a scalar value')
+                    call throw_exception(                                       &
+                        'Error in json_update_double: ' //                      &
+                        'the variable is not a scalar value'                    &
+                    )
             end select 
         else
             call json_add(p,name,val)
@@ -1078,10 +1085,10 @@ contains
         !
         implicit none
         
-        type(json_value),pointer            :: p
-        character(kind=CK,len=*),intent(in) :: name
-        integer(IK),intent(in)              :: val
-        logical(LK),intent(out)             :: found
+        type(json_value), pointer            :: p
+        character(kind=CK,len=*), intent(in) :: name
+        integer(IK), intent(in)              :: val
+        logical(LK), intent(out)             :: found
         
         type(json_value),pointer :: p_var
         integer(IK) :: var_type
@@ -1094,8 +1101,10 @@ contains
                 call to_integer(p_var, val)
             case default
                 found = .false.
-                call throw_exception('Error in json_update_integer: '//&
-                                    'the variable is not a scalar value')
+                call throw_exception(                                           &
+                    'Error in json_update_integer: ' //                         &
+                    'the variable is not a scalar value'                        &
+                )
             end select
         else
             call json_add(p,name, val)
@@ -1112,10 +1121,10 @@ contains
         !
         implicit none
     
-        type(json_value),pointer            :: p
-        character(kind=CK,len=*),intent(in) :: name
-        character(kind=CK,len=*),intent(in) :: val
-        logical(LK),intent(out)             :: found
+        type(json_value), pointer            :: p
+        character(kind=CK,len=*), intent(in) :: name
+        character(kind=CK,len=*), intent(in) :: val
+        logical(LK), intent(out)             :: found
         
         type(json_value),pointer :: p_var
         integer(IK) :: var_type
@@ -1128,8 +1137,10 @@ contains
                 call to_string(p_var,val)
             case default
                 found = .false.
-                call throw_exception('Error in json_update_string: '//&
-                                    'the variable is not a scalar value')
+                call throw_exception(                                           &
+                    'Error in json_update_string: ' //                          &
+                    'the variable is not a scalar value'                        &
+                )
             end select          
         else
             call json_add(p,name,val)
@@ -1495,15 +1506,19 @@ contains
                     if (associated(p%next)) then
                         p => p%next
                     else
-                        call throw_exception('Error in json_value_get_by_index:'//&
-                                            ' p%next is not associated.')
+                        call throw_exception(                                   &
+                            'Error in json_value_get_by_index:' //              &
+                            ' p%next is not associated.'                        &
+                        )
                         nullify(p)
                         return
                     end if
                 end do
             else
-                call throw_exception('Error in json_value_get_by_index:'//&
-                                    ' this%children is not associated.')
+                call throw_exception(                                           &
+                    'Error in json_value_get_by_index:' //                      &
+                    ' this%children is not associated.'                         &
+                )
             end if
         end if
     end subroutine json_value_get_by_index
@@ -1540,25 +1555,30 @@ contains
                     end do
                 end if
                 !did not find anything:
-                call throw_exception('Error in json_value_get_by_name_chars: '//&
-                                    'child variable '//trim(name)//' was not found.')
+                call throw_exception(                                           &
+                    'Error in json_value_get_by_name_chars: ' //                &
+                    'child variable ' // trim(name)           //                &
+                    ' was not found.'                                           &
+                )
                 nullify(p)
             else
-                call throw_exception('Error in json_value_get_by_name_chars: '//&
-                                    'pointer is not associated.')
+                call throw_exception(                                           &
+                    'Error in json_value_get_by_name_chars: ' //                &
+                    'pointer is not associated.'                                &
+                )
             end if
         end if
     end subroutine json_value_get_by_name_chars
 
 
-    subroutine json_value_to_string(me,str)
+    subroutine json_value_to_string(me, str)
         !
         ! Purpose:
         !   Print the JSON structure to an allocatable string.
         !
         implicit none
-        type(json_value),pointer,intent(in)              :: me
-        character(kind=CK,len=:),intent(out),allocatable :: str
+        type(json_value), pointer, intent(in)              :: me
+        character(kind=CK,len=:), intent(out), allocatable :: str
         
         str = ''
         call json_value_print(me, iunit=0, str=str, indent=1, colon=.true.)
@@ -1639,7 +1659,7 @@ contains
         ! a file. This mode is used by 
         ! json_value_to_string.
 
-        character(kind=CK,len=max_numeric_str_len) :: tmp !for val to string conversions
+        character(kind=CK,len=max_numeric_str_len) :: tmp
         character(kind=CK,len=:),allocatable :: s
         type(json_value),pointer :: element
         integer(IK) :: tab, i, count, spaces
@@ -1691,7 +1711,10 @@ contains
                     
                     if (count==0) then    !special case for empty object
                     
-                        call write_it( s//start_object//end_object, comma=print_comma )
+                        call write_it(                                          &
+                            s // start_object // end_object,                    &
+                            comma=print_comma                                   &
+                        )
                 
                     else
                 
@@ -1709,19 +1732,25 @@ contains
             
                             ! print the name
                             if (allocated(element%name)) then
-                                call write_it(repeat(space, spaces)//quotation_mark//&
-                                            element%name//quotation_mark//colon_char//space,&
-                                            advance=.false.)
+                                call write_it(                                  &
+                                    repeat(space, spaces) // quotation_mark //  &
+                                    element%name // quotation_mark //           &
+                                    colon_char // space, advance=.false.        &
+                                )
                             else
-                                call throw_exception('Error in json_value_print:'//&
-                                                    ' element%name not allocated')
+                                call throw_exception(                           &
+                                    'Error in json_value_print:'  //            &
+                                    ' element%name not allocated'               &
+                                )
                                 nullify(element)
                                 return
                             end if
                             
                             ! recursive print of the element
-                            call json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                                need_comma=i<count, colon=.true., str=str)
+                            call json_value_print(                              &
+                                element, iunit=iunit, indent=tab + 1,           &
+                                need_comma=i<count, colon=.true., str=str       &
+                            )
                             
                             ! get the next child the list:
                             element => element%next
@@ -1729,7 +1758,8 @@ contains
                         end do
                         
                         ! [one fewer tab if it isn't an array element]
-                        if (.not. is_array) s = repeat(space, max(0,spaces-spaces_per_tab))
+                        if (.not. is_array)                                     &
+                            s = repeat(space, max(0,spaces-spaces_per_tab))
                         call write_it( s//end_object, comma=print_comma )
                         nullify(element)
                     
@@ -1741,7 +1771,9 @@ contains
                     
                     if (count==0) then    !special case for empty array
 
-                        call write_it( s//start_array//end_array, comma=print_comma )
+                        call write_it(                                          &
+                            s//start_array//end_array, comma=print_comma        &
+                        )
                         
                     else
 
@@ -1752,8 +1784,11 @@ contains
                         do i = 1, count
                             
                             ! recursive print of the element
-                            call json_value_print(element, iunit=iunit, indent=tab,&
-                                                need_comma=i<count, is_array_element=.true., str=str)
+                            call json_value_print(                              &
+                                element, iunit=iunit, indent=tab,               &
+                                need_comma=i<count, is_array_element=.true.,    &
+                                str=str                                         &
+                            )
             
                             ! get the next child the list:
                             element => element%next
@@ -1761,8 +1796,10 @@ contains
                         end do
                         
                         !indent the closing array character:        
-                        call write_it( repeat(space, max(0,spaces-spaces_per_tab))//end_array,&
-                                    comma=print_comma )
+                        call write_it(                                          &
+                            repeat(space, max(0,spaces-spaces_per_tab)) //      &
+                            end_array, comma=print_comma                        &
+                        )
                         nullify(element)
                     
                     end if
@@ -1774,11 +1811,16 @@ contains
                 case (json_string)
 
                     if (allocated(this%str_value)) then
-                        call write_it( s//quotation_mark// &
-                                    trim(this%str_value)//quotation_mark, comma=print_comma )
+                        call write_it(                                          &
+                            s // quotation_mark //                              &
+                            trim(this%str_value) //                             &
+                            quotation_mark, comma=print_comma                   &
+                        )
                     else
-                        call throw_exception('Error in json_value_print:'//&
-                                            ' this%value_string not allocated')
+                        call throw_exception(                                   &
+                            'Error in json_value_print:' //                     &
+                            ' this%value_string not allocated'                  &
+                        )
                         return
                     end if
 
@@ -1804,7 +1846,9 @@ contains
 
                 case default
 
-                call throw_exception('Error in json_value_print: unknown data type')
+                call throw_exception(                                           &
+                    'Error in json_value_print: unknown data type'              &
+                )
 
             end select
 
@@ -1814,16 +1858,16 @@ contains
 
     contains
 
-        subroutine write_it(string,advance,comma)
+        subroutine write_it(string, advance, comma)
             !
             ! Purpose:
             !   write the string to the file (or the output string)
             !
             implicit none
 
-            character(kind=CK,len=*), intent(in) :: string        !string to print
-            logical(LK), intent(in), optional    :: advance  !to add line break or not
-            logical(LK), intent(in), optional    :: comma    !print comma after the string
+            character(kind=CK,len=*), intent(in) :: string   ! string to print
+            logical(LK), intent(in), optional    :: advance  ! to add line break or not
+            logical(LK), intent(in), optional    :: comma    ! print comma after the string
         
             logical(LK) :: add_line_break, add_comma
             character(kind=CK,len=:), allocatable :: string2
@@ -2519,8 +2563,8 @@ contains
                                                 j=j+4
                                             else
                                                 call throw_exception(           &
-                                                    'Error in json_get_string:'     //&
-                                                    ' Invalid hexadecimal sequence' //&
+                                                    'Error in json_get_string:'     // &
+                                                    ' Invalid hexadecimal sequence' // &
                                                     ' in string: '//            &
                                                     trim(c)                     &
                                                 )
@@ -2530,7 +2574,7 @@ contains
                                         case default
                                             call throw_exception(               &
                                                 'Error in json_get_string:' //  &
-                                                ' unknown escape sequence in string "' //&
+                                                ' unknown escape sequence in string "' // &
                                                 trim(s) //                      &
                                                 '" [' // backslash // c // ']'  &
                                             )
@@ -2627,8 +2671,8 @@ contains
             implicit none
 
             type(json_value),pointer,intent(in) :: element
-            integer(IK),intent(in)              :: i        !index
-            integer(IK),intent(in)              :: count    !size of array
+            integer(IK),intent(in)              :: i
+            integer(IK),intent(in)              :: count
 
             character(kind=CK,len=:),allocatable :: cval
 
@@ -2873,11 +2917,11 @@ contains
                 end if
                 
                 !create the error message:
-                err_message = err_message//newline//&
-                            'line: '//trim(adjustl(line_str))//', '//&
-                            'character: '//trim(adjustl(char_str))//newline//&
-                            trim(line)//newline//arrow_str
-                                            
+                err_message = err_message // newline //                         &
+                              'line: ' // trim(adjustl(line_str)) // ', ' //    &
+                              'character: ' // trim(adjustl(char_str)) //       &
+                              newline // trim(line) // newline // arrow_str     
+                              
                 if (allocated(line)) deallocate(line)
                             
             end if
@@ -2887,7 +2931,9 @@ contains
 
         else
 
-            call throw_exception('Error in json_parse: Error opening file: '//trim(file))
+            call throw_exception(                                               &
+                'Error in json_parse: Error opening file: ' // trim(file)       &
+            )
             nullify(p)
 
         end if
@@ -2906,11 +2952,11 @@ contains
         integer(IK), intent(in)                            :: iunit
         character(kind=CK,len=:), allocatable, intent(out) :: line
         
-        integer(IK), parameter              :: n_chunk = 256   ! chunk size [arbitrary]
-        character(kind=CK,len=*), parameter :: nfmt = '(A256)' ! corresponding format statement
+        integer(IK), parameter              :: n_chunk = 256
+        character(kind=CK,len=*), parameter :: nfmt = '(A256)'
         
         character(kind=CK,len=n_chunk) :: chunk
-        integer(IK) :: istat, isize
+        integer(IK)                    :: istat, isize
     
         ! initialize:
         line = ''
